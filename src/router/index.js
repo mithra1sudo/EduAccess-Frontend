@@ -5,7 +5,6 @@ import PrimarySection from '@/views/PrimarySection.vue'
 import JuniorSection from '@/views/JuniorSection.vue'
 import SeniorSection from '@/views/SeniorSection.vue'
 import Login from '@/views/LoginView.vue'
-import DashboardView from '@/views/DashboardView.vue'
 import FAQView from '@/views/FAQView.vue'
 
 const router = createRouter({
@@ -59,7 +58,12 @@ const router = createRouter({
       { path: 'senior', component: SeniorSection }
     ]
   },
-  { path: '/dashboard', component: DashboardView }, // Ensure this exists
+  {
+    path: '/dashboard',
+    name: 'DashboardView',
+    component: () => import('@/views/DashboardView.vue'),
+    meta: { requiresAuth: true }    // Ensure this exists
+  },
   { path: '/faq', component: FAQView } // Ensure this exists
 ]
  })

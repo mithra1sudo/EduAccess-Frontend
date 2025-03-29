@@ -27,6 +27,18 @@
               ></v-text-field>
 
               <v-text-field
+                v-model="phone"
+                label="Phone Number"
+                prepend-inner-icon="mdi-phone"
+                :rules="[
+                (v) => !!v || 'Phone number is required',
+                (v) => /^[0-9]{10,15}$/.test(v) || 'Enter a valid phone number' ]"
+                required
+                 outlined
+                dense
+              ></v-text-field>
+
+              <v-text-field
                 v-model="email"
                 label="Email"
                 prepend-inner-icon="mdi-email"
@@ -121,43 +133,44 @@ import axios from 'axios'
 
 const router = useRouter()
 
-const form = ref(null)
-const name = ref('')
-const email = ref('')
-const password = ref('')
-const password_confirmation = ref('')
-const userPhoto = ref(null)
-const showPassword = ref(false)
-const showConfirmPassword = ref(false)
-const loading = ref(false)
-const errorMessage = ref('')
+const form = ref(null) // Add form ref
+const name = ref('')  // Add name ref
+const phone = ref('') // Add phone number ref
+const email = ref('') // Add email ref
+const password = ref('') // Add password ref
+const password_confirmation = ref('') // Add password confirmation ref
+const userPhoto = ref(null) // Add user photo ref
+const showPassword = ref(false) // Add show password ref
+const showConfirmPassword = ref(false) // Add show confirm password ref
+const loading = ref(false) // Add loading ref
+const errorMessage = ref('') // Add error message ref
 
 // Define the API base URL - adjust this as needed
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api'
 
-const register = async () => {
-  const isValid = form.value.validate()
+const register = async () => {  // Add register function
+  const isValid = form.value.validate() // Validate the form
 
-  if (!isValid) return
+  if (!isValid) return // Exit if form is not valid
 
-  loading.value = true
-  errorMessage.value = ''
+  loading.value = true // Set loading to true
+  errorMessage.value = '' // Clear error message
 
-  const formData = new FormData()
-  formData.append('name', name.value)
-  formData.append('email', email.value)
-  formData.append('password', password.value)
-  formData.append('password_confirmation', password_confirmation.value)
+  const formData = new FormData() // Create a new FormData object
+  formData.append('name', name.value) // Add name to form data
+  formData.append('phone', phone.value) // Add phone number to form data
+  formData.append('email', email.value) // Add email to form data
+  formData.append('password', password.value) // Add password to form data
+  formData.append('password_confirmation', password_confirmation.value) // Add password confirmation to form data
 
-  if (userPhoto.value) {
-    formData.append('user_photo', userPhoto.value)
+  if (userPhoto.value) { // Add user photo to form data if available
+    formData.append('user_photo', userPhoto.value) // Add user photo to form data
   }
 
-  try {
-    // Updated endpoint path - adjust based on your actual Laravel routes
-    const response = await axios.post(`${API_URL}/register`, formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
+  try { // Try to register the user
+    const response = await axios.post(`${API_URL}/register`, formData, { // Send a POST request to the API
+      headers: { // Set headers
+        'Content-Type': 'multipart/form-data', // Set content type
       },
     })
 
@@ -167,28 +180,29 @@ const register = async () => {
     // Store user info in localStorage
     localStorage.setItem('user', JSON.stringify(response.data.user))
 
-    // Navigate to welcome page
-    router.push('/welcome')
-  } catch (error) {
-    console.error('Registration error:', error)
+    // Navigate to dashboard instead of welcome page
+    router.push('/dashboard') // Redirect to dashboard
+  } catch (error) { // Handle any errors
+    console.error('Registration error:', error) // Log the error
 
-    if (error.response) {
-      if (error.response.data.errors) {
-        const errors = error.response.data.errors
-        const firstError = Object.values(errors)[0]
-        errorMessage.value = firstError[0]
-      } else {
-        errorMessage.value = error.response.data.message || 'Registration failed. Please try again.'
+    if (error.response) { // Check if response is available
+      if (error.response.data.errors) {// Check if errors are available
+        const errors = error.response.data.errors// Get errors
+        const firstError = Object.values(errors)[0]// Get first error
+        errorMessage.value = firstError[0]// Set error message
+      } else {// If no errors are available
+        errorMessage.value = error.response.data.message || 'Registration failed. Please try again.'// Set error message
       }
-    } else if (error.request) {
-      errorMessage.value = 'No response from server. Please check your connection or server status.'
-    } else {
-      errorMessage.value = 'Network error. Please check your connection.'
+    } else if (error.request) {// Check if request is available
+      errorMessage.value = 'No response from server. Please check your connection or server status.'// Set error message
+    } else {// If no request is available
+      errorMessage.value = 'Network error. Please check your connection.'// Set error message
     }
-  } finally {
-    loading.value = false
+  } finally {// Finally
+    loading.value = false// Set loading to false
   }
 }
+
 </script>
 
 <style scoped>
